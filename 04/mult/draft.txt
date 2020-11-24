@@ -1,0 +1,80 @@
+@R0
+D=M
+@5
+D=D-add
+@100
+D;JEQ
+@200
+0;JMP
+
+
+@R10 // A is 10 now
+M=A-1 // M is now 9(the register location 10 equel 9)
+D=A+1 // D is 11
+@R5 // A is equel to 5
+M=D;JEQ  // Register 5 equel 11
+
+@R1 // A=1
+M=A // in register 1 the value is 1
+@R2
+D=M // D is 2
+@R3
+M=D+A // in register 3 add D and A
+
+
+
+----------------
+@R1 // A=1
+D=A // D=1
+M=A+D // In register 1, the value is A+D
+D=M // D equel to the value in register 1
+@R2
+M=D // the value in register 2 is equel to D
+
+
+
+trying to add the value
+----
+@R0
+D=M
+@R1
+A=M
+D=A+D
+@R3
+M=D+M
+
+--- Succesful jumo
+// @R3
+// D=M
+// @5
+// D=D-A
+// @100
+// D;JEQ
+// M=A
+// @200
+// 0;JMP
+
+
+LOOP UNSUCCEFUL
+@R1
+M=1
+@R0
+M=0
+
+@R1
+D=M
+@R100
+D=D-A
+@R50
+D;JGT
+@R1
+D=M
+@R0
+M=D+M
+@R1
+M=M+1
+@R1
+0;JMP
+
+@END
+0;JMP

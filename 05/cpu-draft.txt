@@ -1,0 +1,88 @@
+PC(in=registerA,load=false,inc=true,reset=reset,out[0..14]=pc);
+
+    // check instruction type(1 is A 0 is C)
+    Xor(a=instruction[0],b=true,out=instructionType);
+    Not(in=instructionType,out=ninstructionType);  // now C is 1
+
+    //check if the A register should get the input from instructions or ALU
+    //first check if the instructions are type C or A
+    And(a=ninstructionType,b=instruction[10],out=muxSel);
+    Mux16(a=instruction,b=ALUout,sel=muxSel,out=registerAinput);
+
+    
+
+    
+  
+    
+    // register A
+    ARegister(in=registerAinput,load=ninstructionType,out=registerA,out[0..14]=addressM);
+
+    // if the a bit is on, it should accept the in, if not the A
+    And(a=instructionType,b=instruction[4],out=MorALoad);
+    Mux16(a=registerA,b=inM,sel=MorALoad,out=MorA);
+
+    //-------register D-------
+    //check if register D should get an input(if its c instruction then it might be, if its not then no)
+    And(a=ninstructionType,b=instruction[11],out=DregisterLoad);
+    DRegister(in=ALUout,load=DregisterLoad,out=registerD);
+
+
+
+    //checking if I should assign outM or not
+    Mux16(a=ALUout,b=inM,sel=ninstructionType,out=outM);
+    
+
+    ALU(x=registerD,y=MorA,zx=instruction[4],nx=instruction[5],zy=instruction[6],ny=instruction[7],f=instruction[8],no=instruction[9],out=ALUout,zr=equalZero,ng=negative);
+    // DRegister(in=ALUout,load=true,out=registerDw);
+
+
+    
+
+    //check if write to M. first we would check the type of the instructions, and then we would check if we should output it to M
+    And(a=instructionType,b=instruction[12],out=writeM);
+
+
+
+
+
+    //--------PC---------
+    // DMux8Way(in=instructionType,sel=instruction[13..15],a=noJump,b=biggerThenZero,c=isZero,d=biggerOrZero,e=smallerThenZero,f=notZero,g=smallOrZero,h=jump);
+
+    
+    // DMux4Way(in=true,sel=equalZero,a=a,b=b,c=c,d=d);
+
+        //ALU(x=registerD,y=MorA,zx=true,nx=true,zy=true,ny=true,f=true,no=true,out=ALUout,zr=equalZero,ng=negative);
+   // And(a=instruction[11],b=instruction[11],out=test);
+
+
+
+
+   ----------------------------after understing that i got the order wrong
+   PC(in=registerA,load=false,inc=true,reset=reset,out[0..14]=pc);
+
+    // instruction decoder
+        //if its 0 its A, C is 1
+    
+    Or16(a=instruction,b=instruction,out=test);
+    Or(a=instruction[0],b=instruction[0],out=testing0);
+    And(a=instruction[0],b=true,out=instructionType); 
+    Mux16(a=instruction,b=ALUout,sel=instructionType,out=AregisterInput);
+
+
+    // Load: or its A type or C type and instruction[10] is up
+    Not(in=instructionType,out=AinstructionType); // if 1 its of type A
+    And(a=instructionType,b=instruction[10],out=loadAcTYPE);
+    
+    Or(a=AinstructionType,b=loadAcTYPE,out=loadA);
+    ARegister(in=AregisterInput,load=loadA,out=registerA);
+
+    And(a=instructionType,b=instruction[3],out=AorMsal);
+    Mux16(a=registerA,b=inM,sel=AorMsal,out=AorM);
+    
+
+    ALU(x=DRegiste,y=AorM,zx=instruction[4],nx=instruction[5],zy=instruction[6],ny=instruction[7],f=instruction[8],no=instruction[9],out=ALUout,out=outM,zr=equalZero,ng=negative);
+    
+    And(a=instructionType,b=instruction[12],out=writeM);
+
+    And(a=instructionType,b=instruction[11],out=loadD);
+    DRegister(in=ALUout,load=loadD,out=DRegiste);

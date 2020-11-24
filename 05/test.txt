@@ -1,0 +1,77 @@
+ DMux8Way(in=true,sel=instruction[0..2],a=noJump,b=biggerThenZero,c=isZero,d=biggerOrZero,e=smallerThenZero,f=notZero,g=smallOrZero,h=jump);
+    
+    
+    Or(a=biggerThenZero,b=notZero,out=nZeronNegative);
+
+    // all the values that are equal to 0(not negative)
+    Or(a=isZero,b=biggerOrZero,out=isZeroOrBig001);
+    Or(a=smallOrZero,b=isZeroOrBig001,out=isZeroOrBigOrSmall);
+
+
+
+    Or(a=smallerThenZero,b=notZero,out=sZero);
+
+    Not(in=noJump,out=nNoJump);
+    
+    // checking if both of the ALU values are 0(meaning the ALU output is bigger then 0)
+     Or(a=equalZeroALU,b=negativeALU,out=notZeronotNegativeALU);
+     Not(in=notZeronotNegativeALU,out=biggerZeroALU);
+     And(a=biggerZeroALU,b=nZeronNegative,out=nZero1);
+
+    // all values that include 0 
+     Not(in=negativeALU,out=nNegativeALU);
+     And(a=nNegativeALU,b=equalZeroALU,out=isZeroALU);
+
+
+------------------------- old version
+ DMux8Way(in=true,sel=instruction[0..2],a=noJump,b=biggerThenZero,c=isZero,d=biggerOrZero,e=smallerThenZero,f=notZero,g=smallOrZero,h=jump);
+
+    Or(a=biggerOrZero,b=notZero,out=nZero);
+
+    Or(a=isZero,b=biggerOrZero,out=isZero001);
+    Or(a=smallOrZero,b=isZero001,out=isZero01);
+
+    Or(a=smallerThenZero,b=notZero,out=sZero);
+
+    Not(in=noJump,out=nNoJump);
+    
+    // all values that are not 0. if both 0 then its one, else 0
+     Or(a=equalZero,b=negative,out=nZeroALU);
+     Not(in=nZeroALU,out=ZeroALU);
+     
+     And(a=ZeroALU,b=nZero,out=nZero1);
+    // all values that include 0
+     Not(in=negative,out=nNegative);
+     And(a=nNegative,b=equalZero,out=isZero1);
+
+    // all negative values that are not 0
+     Not(in=equalZero,out=nequalZero);
+     And(a=negative,b=nequalZero,out=sZero1);
+
+     Or(a=nZero1,b=isZero1,out=firstcheck);
+     Or(a=firstcheck,b=sZero1,out=pcLoad001);
+
+     And(a=nNoJump,b=pcLoad001,out=pcLoad01);
+
+     And(a=instructionType,b=pcLoad01,out=pcLoad);
+
+    // Mux(a=inM[15],b=instructionType,sel=AorMsal,out=AorM1);
+    // And(a=AorM1,b=true,out=test);
+
+
+    
+
+
+    // all negativeALU values that are not 0
+     Not(in=equalZeroALU,out=nequalZeroALU);
+     And(a=negativeALU,b=nequalZeroALU,out=sZero1);
+
+     Or(a=nZero1,b=isZero1,out=firstcheck);
+     Or(a=firstcheck,b=sZero1,out=pcLoad001);
+
+     And(a=nNoJump,b=pcLoad001,out=pcLoad01);
+
+     And(a=instructionType,b=pcLoad01,out=pcLoad);
+
+    
+    PC(in=registerA,load=pcLoad,inc=true,reset=reset,out[0..14]=pc);

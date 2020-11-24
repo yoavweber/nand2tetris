@@ -1,0 +1,71 @@
+@SP
+M=M-1
+A=M
+D=M
+A=A-1
+D=D-M
+@ISZERO
+D;JEQ
+@SP
+A=M-1
+M=-1
+@INFINITE_LOOP
+D;JMP
+(ISZERO)
+@SP
+A=M-1
+M=0
+(INFINITE_LOOP)
+@INFINITE_LOOP
+0;JMP
+
+
+@SP
+M=M-1
+A=M
+D=M
+A=A-1
+D=D+M
+@ISZERO
+D;JEQ
+@SP
+A=M-1
+M=-1
+@INFINITE_LOOP
+D;JMP
+(ISZERO)
+@SP
+A=M-1
+M=0
+(INFINITE_LOOP)
+@INFINITE_LOOP
+0;JMP
+
+
+
+// @SP
+// A=M
+// A=A-1
+// D=M
+// A=A-1
+// D=D-M
+// @ISZERO
+// D;JEQ
+// @SP
+// A=M
+// A=A-1
+// A=A-1
+// M=-1
+// @SP
+// M=M-1
+// @INFINITE_LOOP
+// D;JMP
+// (ISZERO)
+// @SP
+// A=M
+// A=A-1
+// A=A-1
+// M=0
+// (INFINITE_LOOP)
+// @INFINITE_LOOP
+// 0;JMP

@@ -1,0 +1,123 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+
+    // https://inworks.ucdenver.edu/jkb/iwks3300/Docs/Guidelines%20for%20using%20LC%20with%20Nand2Tetris%20HDL%20tool%20suite.pdf
+    // instruction decoder
+        //if its 0 its A, C is 1
+    
+    And(a=instruction[15],b=true,out=instructionType); 
+    Mux16(a=instruction,b=ALUout,sel=instructionType,out=AregisterInput);
+
+
+    // Load: or its A type or C type and instruction[5] is up
+    Not(in=instructionType,out=AinstructionType); // if 1 its of type A
+    And(a=instructionType,b=instruction[5],out=loadAcTYPE);
+    
+    Or(a=AinstructionType,b=loadAcTYPE,out=loadA);
+    ARegister(in=AregisterInput,load=loadA,out=registerA,out[0..14]=addressM);
+
+    And(a=instructionType,b=instruction[12],out=AorMsal);
+    Mux16(a=registerA,b=inM,sel=AorMsal,out=AorM);
+
+    And(a=inM[15],b=instruction[15],out=test);
+    
+
+    ALU(x=DRegiste,y=AorM,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=ALUout,out=outM,zr=equalZeroALU,ng=negativeALU);
+    
+    And(a=instructionType,b=instruction[3],out=writeM);
+
+    And(a=instructionType,b=instruction[4],out=loadD);
+    DRegister(in=ALUout,load=loadD,out=DRegiste);
+
+    
+    DMux8Way(in=true,sel=instruction[0..2],a=noJump,b=biggerThenZero,c=isZero,d=biggerOrZero,e=smallerThenZero,f=notZero,g=smallOrZero,h=jump);
+    
+    
+    Not(in=noJump,out=nNoJump);
+    
+    Or(a=biggerThenZero,b=notZero,out=biggerZeroComp);
+
+    // all the values that are equal to 0(not negative)
+    Or(a=isZero,b=biggerOrZero,out=isZeroOrBig001);
+    Or(a=smallOrZero,b=isZeroOrBig001,out=isZeroOrBigOrSmall);
+
+    Or(a=smallerThenZero,b=notZero,out=smallZeroComp);
+
+
+    // checking if both of the ALU values are 0(meaning the ALU output is bigger then 0)
+    Or(a=equalZeroALU,b=negativeALU,out=notZeronotNegativeALU);
+    Not(in=notZeronotNegativeALU,out=biggerZeroALU);
+    
+    Or(a=biggerOrZero,b=biggerZeroComp,out=allBigZero);
+    And(a=biggerZeroALU,b=allBigZero,out=biggerZeroSum);
+
+    // all values that include 0 
+    Not(in=negativeALU,out=nNegativeALU);
+    And(a=nNegativeALU,b=equalZeroALU,out=isZeroALU);
+
+    And(a=isZeroALU,b=isZeroOrBigOrSmall,out=isZeroSum);
+
+
+    // all negativeALU values 
+    Not(in=equalZeroALU,out=nequalZeroALU);
+    And(a=negativeALU,b=nequalZeroALU,out=smallZeroALU);
+
+
+    Or(a=smallOrZero,b=smallZeroComp,out=allSmallZero);
+    And(a=smallZeroALU,b=allSmallZero,out=SmallZeroSum);
+
+
+
+    Or(a=biggerZeroSum,b=isZeroSum,out=pcLoad001);
+    Or(a=SmallZeroSum,b=jump,out=pcLoad002);
+
+    Or(a=pcLoad001,b=pcLoad002,out=pcLoad01);
+
+
+    // And(a=nNoJump,b=pcLoad001,out=pcLoad01);
+
+     And(a=instructionType,b=pcLoad01,out=pcLoad);
+
+    
+    PC(in=registerA,load=pcLoad,inc=true,reset=reset,out[0..14]=pc);
+ 
+}
