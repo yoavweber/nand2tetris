@@ -116,7 +116,7 @@ M=M-1
 @SP
 A=M
 M=D
-//assign the stack pzointer to the new location
+//assign the stack pointer to the new location
 @SP
 M=M+1
 '''
@@ -390,20 +390,25 @@ D;JNE
 //save the old LCL
 @LCL
 D=M
+//@{args}
+//D=A+D
 @SP
 A=M
+A=A+1
 M=D
 //save the old ARG
 @ARG
 D=M
 @SP
 A=M+1
+A=A+1
 M=D
 //save the old THIS
 @THIS
 D=M
 @SP
 A=M+1
+A=A+1
 A=A+1
 M=D
 //save the old THAT
@@ -413,6 +418,7 @@ D=M
 A=M+1
 A=A+1
 A=A+1
+A=A+1
 M=D
 //------------assigning the new values----------------------
 //asign new LCL
@@ -420,7 +426,7 @@ A=A+1
 D=A
 @LCL
 M=D
-//assign new ARG
+//assign new ARG pointer
 @{args}
 D=A
 @SP
@@ -429,13 +435,13 @@ D=A-D
 @ARG
 M=D
 //assign new SP
-@{args}
-D=A
+//@{args}
+//D=A
 @LCL
 A=M
-D=A+D
+D=A
 @SP
-M=D+1
+M=D
 @{name}
 0;JMP
         '''
