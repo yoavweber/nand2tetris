@@ -95,12 +95,12 @@ M=D
 //------------assigning the new values----------------------
 //asign new LCL
 A=A+1
+A=A+1
 D=A
 @LCL
 M=D
 //assign new ARG
-//@0
-@argument
+@0
 D=A
 @SP
 A=M
@@ -112,6 +112,7 @@ M=D
 D=A
 @LCL
 A=M
+A=A+1
 D=A+D
 @SP
 M=D+1
@@ -214,7 +215,7 @@ D=A
 @LCL
 A=M+D
 D=A
-@bdjsoleujc
+@kyfyfytvme
 //get the last value in the stack and assign the stack pointer to the right location
 M=D
 
@@ -227,7 +228,7 @@ D=M
 M=M-1
 
 //store it in the segment
-@bdjsoleujc
+@kyfyfytvme
 A=M
 M=D
             
@@ -246,7 +247,7 @@ D=A
 @LCL
 A=M+D
 D=A
-@hedqfmtbhv
+@cqfbvcjtoh
 //get the last value in the stack and assign the stack pointer to the right location
 M=D
 
@@ -259,7 +260,7 @@ D=M
 M=M-1
 
 //store it in the segment
-@hedqfmtbhv
+@cqfbvcjtoh
 A=M
 M=D
             
@@ -278,7 +279,7 @@ D=A
 @LCL
 A=M+D
 D=A
-@knzgnbuzdk
+@nwhwpewikz
 //get the last value in the stack and assign the stack pointer to the right location
 M=D
 
@@ -291,7 +292,7 @@ D=M
 M=M-1
 
 //store it in the segment
-@knzgnbuzdk
+@nwhwpewikz
 A=M
 M=D
             
@@ -337,12 +338,12 @@ M=D
 //------------assigning the new values----------------------
 //asign new LCL
 A=A+1
+A=A+1
 D=A
 @LCL
 M=D
 //assign new ARG
-//@1
-@argument
+@1
 D=A
 @SP
 A=M
@@ -354,6 +355,7 @@ M=D
 D=A
 @LCL
 A=M
+A=A+1
 D=A+D
 @SP
 M=D+1

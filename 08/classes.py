@@ -417,12 +417,12 @@ M=D
 //------------assigning the new values----------------------
 //asign new LCL
 A=A+1
+A=A+1
 D=A
 @LCL
 M=D
 //assign new ARG
-//@{args}
-@argument
+@{args}
 D=A
 @SP
 A=M
