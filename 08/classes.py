@@ -387,11 +387,15 @@ D;JNE
 // -----calling function {name}
 
 //--------saving the old values------------
+// saving the return address
+@{name}1
+D=A
+@SP
+A=M
+M=D
 //save the old LCL
 @LCL
 D=M
-//@{args}
-//D=A+D
 @SP
 A=M
 A=A+1
@@ -444,6 +448,7 @@ D=A
 M=D
 @{name}
 0;JMP
+({name}1)
         '''
         return command
         
@@ -500,5 +505,10 @@ A=A-1
 D=M
 @LCL
 M=D
+@ARG
+A=M
+A=M
+0;JMP
+
         '''
         return command
