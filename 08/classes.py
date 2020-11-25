@@ -371,10 +371,10 @@ M=D+M
 D;JEQ
 (INITALIZIE_{name})
 @LCL
-A=M
+A=M-1
 A=A+D
-M=0
 D=D-1
+M=0
 @INITALIZIE_{name}
 D;JNE
 (EXIT_INITALIZIE_{name})
@@ -416,7 +416,6 @@ A=A+1
 M=D
 //------------assigning the new values----------------------
 //asign new LCL
-A=A+1
 A=A+1
 D=A
 @LCL
@@ -461,7 +460,7 @@ D=M+1
 @SP
 M=D
 
-// getting the prevouse that
+// getting the prevoius that
 @LCL
 A=M
 A=A-1
