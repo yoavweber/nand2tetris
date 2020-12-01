@@ -18,29 +18,39 @@ class Parser:
         self.data = data
     
     def __removeCommentsAndWhiteSpace(self,line):
-        noComments = line.split('/')[0]
-        noWhiteSpace = noComments.split('\n')[0]
+        noComments = line.split('//')[0]
+        noComments2 = noComments.split('/**')[0]
+        noComments3 = noComments2.split('*')[0]
+        noComments4 = noComments3.split('*/')[0]
+        noWhiteSpace = noComments4.split('\n')[0]
         return noWhiteSpace
 
     def parseInstructors(self):
         instructors = []
         for line in self.data:
+            line = line.strip()
+            
             noCommentsLine = self.__removeCommentsAndWhiteSpace(line)
+            # print(noCommentsLine)
+            # try:
+            #     if noCommentsLine[0] == "*" or noCommentsLine[0] == "\*":
+            #         continue
+            # except IndexError:
+                
             if noCommentsLine:
-                instructors.append(noCommentsLine)
+                instructors.append(noCommentsLine.strip())
         return instructors
 
     def getVMfileName(self):
         filename =  str(sys.argv[1])[26:-2]
-        print(filename)
         return filename
 
 
 class JackTokenizer:
 
     
-    def tokenize(token, word):
-        token = f'''<{token}> {word} <{token}/>'''
+    def tokenize(self,token, word):
+        token = f'''<{token}> {word} </{token}>'''
         return token
 
     
@@ -107,8 +117,11 @@ class JackTokenizer:
         if(len(indices) %2 != 0):
             print("incomplete string")
             return -1
+        
+        if len(indices) == 0:
+            return array
+        
         if(len(indices) > 2):
-
             smallerIndexs1 = indices[:len(indices)//2]
             smallerIndexs2 = indices[len(indices)//2:]
             firstHandledStringArray = self.__margeStringToList(array,smallerIndexs1)
@@ -118,7 +131,9 @@ class JackTokenizer:
         return newArray
     
     def __margeStringToList(self,array,indices):
-        joinString = "".join(array[indices[0]+1:indices[1]])
+        
+        #adding \" so the token type could identify the string
+        joinString = "\"" +"".join(array[indices[0]+1:indices[1]])
         stringList = array[:indices[0]]
         stringList.append(joinString)
         newArray = stringList +array[indices[1]+1:]
@@ -131,19 +146,15 @@ class JackTokenizer:
     #         if(s.isalnum() or s == "_" ):
 
 
-    def tokenType(token):
+    def tokenType(self,token):
         if(token in _KEYWORDS):
             return KEYWORD
         elif(token in _SYMBOLS):
             return SYMBOL
-        elif(token.isnumeric() and word < 32767):
+        elif(token.isnumeric() and int(token) < 32767):
             return INTEGER
         elif(token[0] == "\"" or token[0] == "\'"):
             return STRING
         else:
-            if(token != ' '):
-                return  IDENTIFIER
+            return  IDENTIFIER
             
-    
-
-test = JackTokenizer()

@@ -33,21 +33,92 @@ def margeStringToList(array,indices):
 
 
 def main():
-    jack = parser.JackTokenizer()
-    listLine = []
-    tokenList = []
-    # jack.advance('let a[i] = Keyboard.readInt("ENTER THE NEXT NUMBER: ");',listLine)
-    jack.advance('let length = Keyboard.readInt("HOW MANY NUMBERS? ");, "sa d";',listLine)
-
-    listLine.reverse()
-    handleStringArray = jack.handleString(listLine)
+    fullTokenArray = ['<tokens>'] 
     
-    # for s in handleStringArray:
+    fileArray = []
+    os.chdir(str(sys.argv[1]))
+    for file in glob.glob("*.jack"):
+        if file == 'Main.jack':
+            fileArray.insert(0,file)
+        else:
+            fileArray.append(file)
+            
+    jack = parser.JackTokenizer()
+    for file in fileArray:
+        with open(file) as f:
+            read_data = f.readlines()
+            cleaningParser = parser.Parser(read_data)
+            cleanInstructionArray = cleaningParser.parseInstructors()
+            for line in cleanInstructionArray:
+                # we would change the state of the list later
+                listLine = []
+                tokenList = []
+                #adding the line to the list using the advance function
+                jack.advance(line,listLine)
+
+                listLine.reverse()
+                
+                handleStringArray = jack.handleString(listLine)
+    
+                for token in handleStringArray:
+                    tokenType = jack.tokenType(token)
+                    if(token != " "):
+                        if(tokenType == "stringConstant"):
+                            fullToken = jack.tokenize(tokenType,token[1:])
+                        else:
+                            if(token == "<"):
+                                token = "&lt;"
+                            elif(token == ">"):
+                                token = "&gt;"
+                            elif(token == "\""):
+                                token = "&quot;"
+                            elif(token == "&"):
+                                token = "&amp;"
+                            
+                            fullToken = jack.tokenize(tokenType,token)
+                            
+                        #create a function for all symbols
+                 
+                        
+                        tokenList.append(fullToken)
+
+                        f.close()
+                fullTokenArray += tokenList
+    fullTokenArray.append("</tokens>\n")
+                
+    for i in fullTokenArray:
+        print(i)
+            
+    
+    
+    # jack = parser.JackTokenizer()
+    # listLine = []
+    # tokenList = []
+    # jack.advance('do Output.printInt(sum / length);',listLine)
+
+    # listLine.reverse()
+    # handleStringArray = jack.handleString(listLine)
+    
+    # for token in handleStringArray:
+    #     tokenType = jack.tokenType(token)
+    #     print(token)
+    #     if(token != " "):
+    #         if(tokenType == "stringConstant"):
+    #             fullToken = jack.tokenize(tokenType,token[1:])
+    #         else:
+    #             fullToken = jack.tokenize(tokenType,token)
+    #         tokenList.append(fullToken)
+    # print(tokenList)
+    
+        
         
     
-    print(handleStringArray)
-    print(listLine, "the original list(after advance and reverse")
     
+    # print(handleStringArray)
+
+    # print(fullTokenArray, "the original list(after advance and reverse")
+    
+#----------------------------------------------
 
 
 #     machineCodeArray = [] 
