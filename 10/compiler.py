@@ -35,55 +35,55 @@ def margeStringToList(array,indices):
 def main():
     fullTokenArray = ['<tokens>'] 
     
-    fileArray = []
-    os.chdir(str(sys.argv[1]))
-    for file in glob.glob("*.jack"):
-        if file == 'Main.jack':
-            fileArray.insert(0,file)
-        else:
-            fileArray.append(file)
+    # fileArray = []
+    # os.chdir(str(sys.argv[1]))
+    # for file in glob.glob("*.jack"):
+    #     if file == 'Main.jack':
+    #         fileArray.insert(0,file)
+    #     else:
+    #         fileArray.append(file)
             
     jack = parser.JackTokenizer()
-    for file in fileArray:
-        with open(file) as f:
-            read_data = f.readlines()
-            cleaningParser = parser.Parser(read_data)
-            cleanInstructionArray = cleaningParser.parseInstructors()
-            for line in cleanInstructionArray:
-                # we would change the state of the list later
-                listLine = []
-                tokenList = []
-                #adding the line to the list using the advance function
-                jack.advance(line,listLine)
+    # for file in fileArray:
+    with open(str(sys.argv[1])) as f:
+        read_data = f.readlines()
+        cleaningParser = parser.Parser(read_data)
+        cleanInstructionArray = cleaningParser.parseInstructors()
+        for line in cleanInstructionArray:
+            # we would change the state of the list later
+            listLine = []
+            tokenList = []
+            #adding the line to the list using the advance function
+            jack.advance(line,listLine)
 
-                listLine.reverse()
-                
-                handleStringArray = jack.handleString(listLine)
-    
-                for token in handleStringArray:
-                    tokenType = jack.tokenType(token)
-                    if(token != " "):
-                        if(tokenType == "stringConstant"):
-                            fullToken = jack.tokenize(tokenType,token[1:])
-                        else:
-                            if(token == "<"):
-                                token = "&lt;"
-                            elif(token == ">"):
-                                token = "&gt;"
-                            elif(token == "\""):
-                                token = "&quot;"
-                            elif(token == "&"):
-                                token = "&amp;"
-                            
-                            fullToken = jack.tokenize(tokenType,token)
-                            
-                        #create a function for all symbols
-                 
+            listLine.reverse()
+            
+            handleStringArray = jack.handleString(listLine)
+
+            for token in handleStringArray:
+                tokenType = jack.tokenType(token)
+                if(token != " "):
+                    if(tokenType == "stringConstant"):
+                        fullToken = jack.tokenize(tokenType,token[1:])
+                    else:
+                        if(token == "<"):
+                            token = "&lt;"
+                        elif(token == ">"):
+                            token = "&gt;"
+                        elif(token == "\""):
+                            token = "&quot;"
+                        elif(token == "&"):
+                            token = "&amp;"
                         
-                        tokenList.append(fullToken)
+                        fullToken = jack.tokenize(tokenType,token)
+                        
+                    #create a function for all symbols
+                
+                    
+                    tokenList.append(fullToken)
 
-                        f.close()
-                fullTokenArray += tokenList
+                    f.close()
+            fullTokenArray += tokenList
     fullTokenArray.append("</tokens>\n")
                 
     for i in fullTokenArray:

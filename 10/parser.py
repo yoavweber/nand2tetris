@@ -18,11 +18,15 @@ class Parser:
         self.data = data
     
     def __removeCommentsAndWhiteSpace(self,line):
-        noComments = line.split('//')[0]
-        noComments2 = noComments.split('/**')[0]
-        noComments3 = noComments2.split('*')[0]
-        noComments4 = noComments3.split('*/')[0]
-        noWhiteSpace = noComments4.split('\n')[0]
+        line = line.split('//')[0]
+        line = line.split('/**')[0]
+        line = line.split('*/')[0]
+        try:
+            if line[0] == '*':
+                line = line.split('*')[0]
+        except IndexError:
+            pass
+        noWhiteSpace = line.split('\n')[0]
         return noWhiteSpace
 
     def parseInstructors(self):
