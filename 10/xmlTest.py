@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
-
-
+import xml.dom.minidom as DOM
 
 tree = ET.parse('xmltest.xml')
 root = tree.getroot()
@@ -26,6 +25,14 @@ child = ET.SubElement(test,"child")
 # test = root.find()
 
 
+#TODO: handle somehow with the parents element and aviod 3 arguments. the name should be "append existing element"
+def appendElement(parentElement,element,appendedElement):
+    elementLocation = len(list(element))
+    parentElement.remove(appendedElement) 
+    element.insert(elementLocation,appendedElement)
+    return element
+    
+
 def getIndex(element):
     index = list(root).index(element)
     return index
@@ -33,67 +40,90 @@ def getIndex(element):
 def getNextElement(index):
     return root[index+1]
 
+def compileExpression(index):
+    expressionWrapper = ET.Element("expression")
+    termWrapper = ET.Element("term")
 
+    nextElement = getNextElement(index)
+    if nextElement.tag != "identifier":
+        print("error compiling let, missing identifier")
+        return -1
+    termWrapper = appendElement(root,termWrapper,nextElement)
+    
+    expressionWrapper.append(termWrapper)
+    return expressionWrapper
+    
+    # previousLet = root[index+1]
+    # root.remove(previousLet)
+    
+    
+    
+
+
+# ------- compiling let and sending back the element
 def compileLet(index):
     letWrapper = ET.Element("letStatement")
-    childCounter = 0
-    counter = index
+    
+    counter = index -1
     
     # #-------removing the element the let element to aviode duplication
     let = root[index]
-    # root.remove(let)
-    
     #-------Inserting the element again under the let wrapper
-    letWrapper.insert(childCounter,let)
-    childCounter += 1
+    letWrapper = appendElement(root,letWrapper,let)
     
-    nextElement = getNextElement(index)
+    nextElement = getNextElement(counter)
     #TODO:create check function
     if nextElement.tag != "identifier":
         print("error compiling let, missing identifier")
         return -1
     #-------adding the first child to the let wrapper---------
-    letWrapper.insert(childCounter,nextElement)
-    counter += 1
-    childCounter += 1
-    
-    nextElement = getNextElement(counter)
-    
+    letWrapper = appendElement(root,letWrapper,nextElement)
+      
+    nextElement = getNextElement(counter)  
     if nextElement.text.strip() != "=":
         print("error compiling let, missing =")
         return -1
-    letWrapper.insert(childCounter,nextElement)
-    counter += 1
-    childCounter += 1
+    letWrapper = appendElement(root,letWrapper,nextElement)
     
-    # counter = compileExpression(counter)
-    counter += 1
+    exp = compileExpression(counter)
+    letWrapper.append(exp)
     
+    # nextElement = getNextElement(counter)
+    
+    # if nextElement.tag != "identifier":
+    #     print("error compiling let, missing identifier")
+    #     return -1
+    # letWrapper = appendElement(root,letWrapper,nextElement)
+   
     nextElement = getNextElement(counter)
-    
     if nextElement.text.strip() != ";":
+        print(nextElement.text)
         print("error compiling let, missing ; at",counter)
         return -1
-    letWrapper.insert(childCounter,nextElement)
-    counter += 1
-    
+    letWrapper = appendElement(root,letWrapper,nextElement)
     root.insert(index,letWrapper)
-    test = root[index+1]
-    print(test.tag)
-    root.remove(test)
+    previousLet = root[index+1]
+    root.remove(previousLet)
+
+    return letWrapper
+
+
+
     
-    return counter
+
     
     
-    
-    
-compileLet(33)
+x= compileLet(33)
+
+# print(root[x].tag)
+# print(root[34].tag)
         
     
     
-    
-        
-    
+dom = DOM.parseString(ET.tostring(root, encoding='utf8').decode('utf8'))
+
+pretty_xml_as_string = dom.toprettyxml()
+
 
 
 #----------------Inserting a new parents to all let------------------------
@@ -108,8 +138,8 @@ compileLet(33)
 #     #    alls = ET.SubElement(letWrapper,let)
 #     #    root.insert(x,letWrapper)
            
-       
-    
+
+# print(pretty_xml_as_string)
     
     
 #---------------print the xml file
