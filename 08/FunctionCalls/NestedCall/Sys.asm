@@ -9,10 +9,10 @@ M=D+M
 D;JEQ
 (INITALIZIE_Sys.init)
 @LCL
-A=M
+A=M-1
 A=A+D
-M=0
 D=D-1
+M=0
 @INITALIZIE_Sys.init
 D;JNE
 (EXIT_INITALIZIE_Sys.init)
@@ -65,23 +65,32 @@ M=D
 // -----calling function Sys.main
 
 //--------saving the old values------------
+// saving the return address
+@Sys.main1
+D=A
+@SP
+A=M
+M=D
 //save the old LCL
 @LCL
 D=M
 @SP
 A=M
+A=A+1
 M=D
 //save the old ARG
 @ARG
 D=M
 @SP
 A=M+1
+A=A+1
 M=D
 //save the old THIS
 @THIS
 D=M
 @SP
 A=M+1
+A=A+1
 A=A+1
 M=D
 //save the old THAT
@@ -91,15 +100,15 @@ D=M
 A=M+1
 A=A+1
 A=A+1
+A=A+1
 M=D
 //------------assigning the new values----------------------
 //asign new LCL
 A=A+1
-A=A+1
 D=A
 @LCL
 M=D
-//assign new ARG
+//assign new ARG pointer
 @0
 D=A
 @SP
@@ -108,16 +117,16 @@ D=A-D
 @ARG
 M=D
 //assign new SP
-@0
-D=A
+//@0
+//D=A
 @LCL
 A=M
-A=A+1
-D=A+D
+D=A
 @SP
-M=D+1
+M=D
 @Sys.main
 0;JMP
+(Sys.main1)
         
 // pop temp 6
 
@@ -147,10 +156,10 @@ M=D+M
 D;JEQ
 (INITALIZIE_Sys.main)
 @LCL
-A=M
+A=M-1
 A=A+D
-M=0
 D=D-1
+M=0
 @INITALIZIE_Sys.main
 D;JNE
 (EXIT_INITALIZIE_Sys.main)
@@ -215,7 +224,7 @@ D=A
 @LCL
 A=M+D
 D=A
-@kyfyfytvme
+@mcwgihczjv
 //get the last value in the stack and assign the stack pointer to the right location
 M=D
 
@@ -228,7 +237,7 @@ D=M
 M=M-1
 
 //store it in the segment
-@kyfyfytvme
+@mcwgihczjv
 A=M
 M=D
             
@@ -247,7 +256,7 @@ D=A
 @LCL
 A=M+D
 D=A
-@cqfbvcjtoh
+@tpeqqkvuvv
 //get the last value in the stack and assign the stack pointer to the right location
 M=D
 
@@ -260,7 +269,7 @@ D=M
 M=M-1
 
 //store it in the segment
-@cqfbvcjtoh
+@tpeqqkvuvv
 A=M
 M=D
             
@@ -279,7 +288,7 @@ D=A
 @LCL
 A=M+D
 D=A
-@nwhwpewikz
+@ckiheggiso
 //get the last value in the stack and assign the stack pointer to the right location
 M=D
 
@@ -292,7 +301,7 @@ D=M
 M=M-1
 
 //store it in the segment
-@nwhwpewikz
+@ckiheggiso
 A=M
 M=D
             
@@ -308,23 +317,32 @@ M=M+1
 // -----calling function Sys.add12
 
 //--------saving the old values------------
+// saving the return address
+@Sys.add121
+D=A
+@SP
+A=M
+M=D
 //save the old LCL
 @LCL
 D=M
 @SP
 A=M
+A=A+1
 M=D
 //save the old ARG
 @ARG
 D=M
 @SP
 A=M+1
+A=A+1
 M=D
 //save the old THIS
 @THIS
 D=M
 @SP
 A=M+1
+A=A+1
 A=A+1
 M=D
 //save the old THAT
@@ -334,15 +352,15 @@ D=M
 A=M+1
 A=A+1
 A=A+1
+A=A+1
 M=D
 //------------assigning the new values----------------------
 //asign new LCL
 A=A+1
-A=A+1
 D=A
 @LCL
 M=D
-//assign new ARG
+//assign new ARG pointer
 @1
 D=A
 @SP
@@ -351,16 +369,16 @@ D=A-D
 @ARG
 M=D
 //assign new SP
-@1
-D=A
+//@1
+//D=A
 @LCL
 A=M
-A=A+1
-D=A+D
+D=A
 @SP
-M=D+1
+M=D
 @Sys.add12
 0;JMP
+(Sys.add121)
         
 // pop temp 5
 
@@ -386,7 +404,7 @@ D=M
 @SP
 A=M
 M=D
-//assign the stack pzointer to the new location
+//assign the stack pointer to the new location
 @SP
 M=M+1
 
@@ -402,7 +420,7 @@ D=M
 @SP
 A=M
 M=D
-//assign the stack pzointer to the new location
+//assign the stack pointer to the new location
 @SP
 M=M+1
 
@@ -418,7 +436,7 @@ D=M
 @SP
 A=M
 M=D
-//assign the stack pzointer to the new location
+//assign the stack pointer to the new location
 @SP
 M=M+1
 
@@ -434,7 +452,7 @@ D=M
 @SP
 A=M
 M=D
-//assign the stack pzointer to the new location
+//assign the stack pointer to the new location
 @SP
 M=M+1
 
@@ -450,7 +468,7 @@ D=M
 @SP
 A=M
 M=D
-//assign the stack pzointer to the new location
+//assign the stack pointer to the new location
 @SP
 M=M+1
 
@@ -495,7 +513,22 @@ M=D+M
 @SP
 M=M-1
         
-//assign the return value to the global stack
+// -------------- return function
+//assign the return value to the global stack?
+
+// get the old return value
+@LCL
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
+@ckfbcylyfh
+M=D
+
+//assning the return value to the preivous stack
 @SP
 A=M
 A=A-1
@@ -504,13 +537,15 @@ D=M
 A=M
 M=D
 
-//assigning the old stack location
+//assigning the old stack pointer location
 @ARG
 D=M+1
 @SP
 M=D
 
-// getting the prevouse that
+
+
+// getting the prevoius that
 @LCL
 A=M
 A=A-1
@@ -544,6 +579,13 @@ A=A-1
 D=M
 @LCL
 M=D
+
+// jump to the return address
+@ckfbcylyfh
+D=M
+A=D
+0;JMP
+
         
 //--------function decleration -------
 (Sys.add12)
@@ -555,10 +597,10 @@ M=D+M
 D;JEQ
 (INITALIZIE_Sys.add12)
 @LCL
-A=M
+A=M-1
 A=A+D
-M=0
 D=D-1
+M=0
 @INITALIZIE_Sys.add12
 D;JNE
 (EXIT_INITALIZIE_Sys.add12)
@@ -619,7 +661,7 @@ D=M
 @SP
 A=M
 M=D
-//assign the stack pzointer to the new location
+//assign the stack pointer to the new location
 @SP
 M=M+1
 
@@ -643,7 +685,22 @@ M=D+M
 @SP
 M=M-1
         
-//assign the return value to the global stack
+// -------------- return function
+//assign the return value to the global stack?
+
+// get the old return value
+@LCL
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
+@yieqpzdlcq
+M=D
+
+//assning the return value to the preivous stack
 @SP
 A=M
 A=A-1
@@ -652,13 +709,15 @@ D=M
 A=M
 M=D
 
-//assigning the old stack location
+//assigning the old stack pointer location
 @ARG
 D=M+1
 @SP
 M=D
 
-// getting the prevouse that
+
+
+// getting the prevoius that
 @LCL
 A=M
 A=A-1
@@ -692,6 +751,13 @@ A=A-1
 D=M
 @LCL
 M=D
+
+// jump to the return address
+@yieqpzdlcq
+D=M
+A=D
+0;JMP
+
         
 (INFINIELOOP)
 @INFINIELOOP

@@ -1,0 +1,61 @@
+class MoveBoard {
+    field Board board;
+    field Point p;
+    constructor MoveBoard new(){
+
+        let board = Board.new(220,240);
+        let p = Point.new(10,15);
+
+        return this;
+    }
+
+    method void dispose() {
+      do board.dispose();
+      do p.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+   
+
+    method void moveBoard(){
+        var char key;
+        
+        var boolean goDownBool;
+        let goDownBool = true;
+
+        while (true) {
+
+            if(goDownBool) {
+                    do p.goDown();
+                    do Sys.wait(5);
+                } 
+            else {
+                do p.goUp();
+            }
+            
+            // do p.goRight();
+            
+            let key = Keyboard.keyPressed();
+            if(key = 132) {
+                do board.moveRight();
+                do Sys.wait(5); 
+                let goDownBool = false;
+            } 
+            if(~(key = 0)) {
+                
+                do Sys.wait(5); 
+            }
+            if(key = 130) {
+                do board.moveLeft();
+                do Sys.wait(5); 
+            }
+            if(key = 81) {
+                return;
+            }
+         }
+        return;
+    }
+
+    
+
+}

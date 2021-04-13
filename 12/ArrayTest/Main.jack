@@ -10,6 +10,10 @@ class Main {
     function void main() {
         var Array r;                  // stores test results
         var Array a, b, c;
+        var int test;
+
+        let test = 5 & 5;
+        do Output.printInt(test);
         
         let r = 8000;
         

@@ -1,7 +1,8 @@
 import parser
+import compilerClass
 import sys
 import glob, os
-
+import xml.etree.ElementTree as ET
 
 # with open(str(sys.argv[1])) as f:
 def handleString(array):
@@ -45,7 +46,8 @@ def main():
             
     jack = parser.JackTokenizer()
     # for file in fileArray:
-    with open(str(sys.argv[1])) as f:
+    # with open(str(sys.argv[1])) as f:
+    with open('./ExpressionLessSquare/Main.jack') as f:
         read_data = f.readlines()
         cleaningParser = parser.Parser(read_data)
         cleanInstructionArray = cleaningParser.parseInstructors()
@@ -85,9 +87,15 @@ def main():
                     f.close()
             fullTokenArray += tokenList
     fullTokenArray.append("</tokens>\n")
-                
-    for i in fullTokenArray:
-        print(i)
+    
+    root = compilerClass.CompliationEngine(fullTokenArray)
+    
+    root.compileClass(0)
+    
+    
+
+    # fr i in fullTokenArray:
+    #     print(i)
             
     
     

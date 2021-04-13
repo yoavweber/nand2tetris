@@ -113,9 +113,7 @@ CHIP CPU {
     Or(a=pcLoad001,b=pcLoad002,out=pcLoad01);
 
 
-    // And(a=nNoJump,b=pcLoad001,out=pcLoad01);
-
-     And(a=instructionType,b=pcLoad01,out=pcLoad);
+    And(a=instructionType,b=pcLoad01,out=pcLoad);
 
     
     PC(in=registerA,load=pcLoad,inc=true,reset=reset,out[0..14]=pc);

@@ -18,9 +18,33 @@ class Output {
 
     // Character map for displaying characters
     static Array charMaps; 
+    static Array bitMask;
+    static int charCols;
+    static int charRows;
+    static int x;
+    static int y;
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+        var int i;
+        var int currentVal;
+
+        do Output.initMap();
+        let currentVal = 1;
+
+        let charCols = 64;
+        let charRows = 23;
+        let i = 0;
+        let bitMask = Array.new(7);
+        while(i<8){
+            let bitMask[i] = currentVal;
+            //making sure that each bit would have 1 and then zero in each location
+            let currentVal = currentVal + currentVal;
+            let i = i+1; 
+        }
+        let x = 0;
+        let y = 0;
+        return;
     }
 
     // Initializes the character map array
@@ -71,7 +95,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,63,51,51,51,51,0,0); //A
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -176,28 +200,104 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+        let charRows = i;
+        let charCols = j;
+
+        let x = i*11;
+        let y = j*8;
+        do Screen.setColor(true);
+        do Screen.drawPixel(y,x);
+        return;
+
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+        var Array letter;
+        var int i;
+        var int j;
+        var int value;
+        var int temp;
+
+        let letter = Output.getMap(c);
+
+
+        while(i < 11){
+            let value = letter[i];
+            let j = 0;
+            while(j < 8){              
+                do Screen.setColor(Output.maskBits(value, j));
+                do Screen.drawPixel(y+j,x+i);
+                let j = j+1;
+            }
+            let i = i + 1;
+        }
+        do Output.autoMoveCursor();
+        return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        var int i;
+        let i = 0;
+        while(i< s.length()){
+            do Output.printChar(s.charAt(i));
+            let i = i +1;
+        }
+        return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        var String intString;
+        let intString = String.new(15);
+        do intString.setInt(i);
+        do Output.printString(intString); 
+        do intString.dispose();
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        do Output.moveCursor(charRows+1,0);
+        return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        do Output.moveCursor(charRows,charCols-1);
+        return;
+    }
+
+    function void autoMoveCursor(){
+        
+        if(charCols = 63){
+            do Output.moveCursor(charRows,0);
+            if(charRows = 22){
+                 do Output.moveCursor(0,charCols);
+            }
+        } else {
+             if(charRows = 22){
+                do Output.moveCursor(0,charCols+1);
+            }
+            do Output.moveCursor(charRows,charCols+1);
+        }
+
+        return;
+    }
+
+
+    function boolean maskBits(int num,int bitIndex){
+        var int isFalse;
+        let isFalse = num & bitMask[bitIndex];
+        if(isFalse = 0){
+            return false;
+        }
+
+        return true;
+
     }
 }

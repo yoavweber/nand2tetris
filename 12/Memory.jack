@@ -9,26 +9,66 @@
  * consists of 32,768 words, each holding a 16-bit binary number.
  */ 
 class Memory {
-
+    
+    static Array ram;
+    static Array heap;
+    static int nodeSize;
+    
     /** Initializes the class. */
     function void init() {
+        let ram = 0;
+        let heap = 2048;
+        let freeList = 2048;
+        let heap[0] = 0;
+        let heap[1] = 14335;
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return ram[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
+        
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+
+        var int nextPoint;
+        let nextPoint = heap[freeList];
+        
+        while(heap[nextPoint+1] < (size+2))1 {
+            let nextPoint = heap[nextPoint];
+        }
+        // changing the size of the segment accourding to the block size
+        let heap[nextPoint+1] = heap[nextPoint+1] - (size+2);
+
+        let heap[heap[nextPoint+1] + 1] = size + 1;
+
+        return heap[nextPoint+1] + 2;
+        //removing the relevant node from the list by assigning the location of the new node to the one before
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
-    function void deAlloc(Array o) {
-    }    
+     function void deAlloc(Array o) {
+      var int next;
+      var int ptr;
+      let next = 0;
+      while(~(heap[next] = 0)) {
+        let next = heap[next];
+      }
+      let ptr = o-1;
+      let heap[ptr] = 0;
+      let heap[next] = ptr;
+
+      return;
+        }
+
 }

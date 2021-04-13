@@ -455,8 +455,24 @@ M=D
     
     
     def __return(self):
+        test =  self.get_random_string(10)
         command = f'''
-//assign the return value to the global stack
+// -------------- return function
+//assign the return value to the global stack?
+
+// get the old return value
+@LCL
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
+@{test}
+M=D
+
+//assning the return value to the preivous stack
 @SP
 A=M
 A=A-1
@@ -465,11 +481,13 @@ D=M
 A=M
 M=D
 
-//assigning the old stack location
+//assigning the old stack pointer location
 @ARG
 D=M+1
 @SP
 M=D
+
+
 
 // getting the prevoius that
 @LCL
@@ -505,9 +523,11 @@ A=A-1
 D=M
 @LCL
 M=D
-@ARG
-A=M
-A=M
+
+// jump to the return address
+@{test}
+D=M
+A=D
 0;JMP
 
         '''

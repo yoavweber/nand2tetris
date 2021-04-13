@@ -1,0 +1,96 @@
+class Board {
+    field int x;
+    field int y;
+    field int size;
+    field int sizeX;
+    // constructor Board new(int x1, int x2, int y1, int y2){
+    constructor Board new(int x1, int y1){
+
+        let x = x1;
+
+        let y = y1;
+        do setSize();
+        do draw();
+        return this;
+    }
+
+    method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+    method void draw() {
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x, y, x + sizeX, y + size);
+      return;
+   }
+
+   method void setSize() {
+       let size = 10;
+       let sizeX = size*2;
+       return;
+   }
+
+    method void moveRight() {
+      if ((x + size) < 510) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x, y, x + 1, y + size);
+         let x = x + 2;
+         do Screen.setColor(true);
+         do Screen.drawRectangle((x + sizeX) - 1, y, x + sizeX, y + size);
+      }
+      return;
+   }
+
+    method void moveLeft() {
+      if (x > 1) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle((x + sizeX) - 1, y, x + sizeX, y + size);
+         let x = x - 2;
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x, y, x + 1, y + size);
+      }
+      return;
+   }
+
+
+    //    method void moveRight(){
+    //     if(x_2< 510) {
+    //         do Screen.setColor(false);
+    //         do Screen.drawRectangle(x_1,y_1,x_2,y_2);
+    //         let x_1 = x_1 + 2;
+    //         let x_2 = x_2 + 2;
+    //         do Screen.setColor(true);
+    //         do Screen.drawRectangle(x_1,y_1,x_2,y_2);
+    //     }
+    //     return;
+    // }
+
+    // method void moveRight(){
+    //     if(x_2< 510) {
+    //         do Screen.setColor(false);
+    //         do Screen.drawRectangle(x_1,y_1,x_2,y_2);
+    //         let x_1 = x_1 + 2;
+    //         let x_2 = x_2 + 2;
+    //         do Screen.setColor(true);
+    //         do Screen.drawRectangle(x_1,y_1,x_2,y_2);
+    //     }
+    //     return;
+    // }
+
+    //  method void moveLeft(){
+    //     if(x_2> 2) {
+    //         // int size = 4;
+    //         do Screen.setColor(false);
+    //         do Screen.drawRectangle(x_1,y_1,x_2,y_2);
+    //         let x_1 = x_1 - 2;
+    //         let x_2 = x_2 - 2;
+    //         do Screen.setColor(true);
+    //         do Screen.drawRectangle(x_1,y_1,x_2,y_2);
+    //     }
+    //     return;
+    // }
+
+    
+
+}

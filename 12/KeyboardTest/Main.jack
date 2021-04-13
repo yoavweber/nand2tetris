@@ -40,12 +40,12 @@ class Main {
         do Output.println();
         do Output.printString("(Verify that the pressed character is echoed to the screen)");
         do Output.println();
+        // do Output.printString("Working? ");
         while (~ok) {
-            do Output.printString("Please press the number '3': ");
+            do Output.printString("Please press the number  s '3': ");
     	    let c = Keyboard.readChar();
-        
             do Output.println();
-        
+            // do Output.printChar(c);
             if (c = 51) {
 	            do Output.printString("ok");
 	            do Output.println();

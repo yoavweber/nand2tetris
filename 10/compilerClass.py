@@ -33,19 +33,23 @@ class CompliationEngine:
     
     def __getCurrentElement(self):
         return self.root[self.counter]
+    
+    def __printTree(self,element):
+        print(ET.tostring(element, encoding='utf8').decode('utf8'))
 
-    def __getNextElement(self,index):
-        return self.root[index+1]
+
+    # def __getNextElement(self,index):
+    #     return self.root[index+1]
     
     #change it to getNextElement
-    def __getNextElements(self):
+    def __getNextElement(self):
         self.counter += 1
         return self.root[self.counter]
     
     def __createWrapper(self,wrapperName):
        return ET.Element(wrapperName)
    
-    #---------------Handle reapting tokens------------
+    #---------------Handle reapting tokens(components)------------
     def __handleBrackets(self,element,brackets):
         if element.text.strip() != "{":
             print("error compiling class, expected { but recived", nextElement.text )
@@ -53,12 +57,32 @@ class CompliationEngine:
         
        #trying to use this function to aviod repitation, still in test
     def __addByTag(self,tokenType,error,wrapper):
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.tag != tokenType:
             print(error, currentElement.text,currentElement.tag)
             return -1
         
         wrapper.append(nextElement)
+        
+    def __addKeywordAndIdentifier(self,wrappingElement):
+        nextElement = self.__getCurrentElement()
+        #checking the type of the memeber varible
+        if nextElement.tag.strip() != "keyword": 
+            print("error compiling classVar, expected keyword or identifier but recived", nextElement.tag, nextElement.text )
+            return -1
+        wrappingElement.append(nextElement)
+        
+        nextElement = self.__getNextElement()
+        if nextElement.tag.strip() != "identifier": 
+            print("error compiling classVar, expected identifier but recived", nextElement.tag, nextElement.text)
+            return -1
+        wrappingElement.append(nextElement)
+        
+        return self.__getNextElement()
+    
+    def __errorMessage(self,error,element,extra=""):
+        print(f"exected to find {error}, got: ", element.text ,element.tag)
+        
         
     
     
@@ -75,7 +99,7 @@ class CompliationEngine:
         # classWrapper = self.__appendExistingElement(self.root,classWrapper,classKeyword)
         classWrapper.append(classKeyword)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.tag != "identifier":
             print("error compiling class, identifier is missing")
             return -1
@@ -84,7 +108,7 @@ class CompliationEngine:
 
         # nextElement = self.__getNextElement(index)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.text.strip() != "{":
             print("error compiling class, expected { but recived", nextElement.text )
             return -1
@@ -94,16 +118,16 @@ class CompliationEngine:
         # self.newRoot.insert(0,classWrapper)
         
         # nextElement = self.__getNextElement(counter)
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         while(nextElement.text.strip() == "static" or nextElement.text.strip() == "field"):
             nextElement = self.compileClassVar()
             classWrapper.append(nextElement)
-            nextElement = self.__getNextElements()
+            nextElement = self.__getNextElement()
         
         while(nextElement.text.strip() in _FUNCTION_TYPE):
-            nextElement = self.compileSubroutine()
+            nextElement = self.compileSubroutineDec()
             classWrapper.append(nextElement)
-            nextElement = self.__getNextElements()
+            nextElement = self.__getNextElement()
             
         
 
@@ -122,20 +146,20 @@ class CompliationEngine:
         firstElement = self.__getCurrentElement()
         classVarWrapper.append(firstElement)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         #checking the type of the memeber varible
         if nextElement.tag.strip() != ("keyword" or "identifier"): 
             print("error compiling classVar, expected keyword or identifier but recived", nextElement.tag, nextElement.text )
             return -1
         classVarWrapper.append(nextElement)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.tag.strip() != "identifier": 
             print("error compiling classVar, expected identifier but recived", nextElement.tag, nextElement.text)
             return -1
         classVarWrapper.append(nextElement)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.text.strip() != ";": 
             print("error compiling classVar, expected ; but recived", nextElement.text )
             return -1
@@ -144,34 +168,34 @@ class CompliationEngine:
         return classVarWrapper
     
     
-    def compileSubroutine(self):
+    def compileSubroutineDec(self):
         
         subRoutineWrapper = self.__createWrapper("subroutineDec")
         
         #I am not checking to see the type of element since this is already been done by the class function
         firstElement = self.__getCurrentElement()
         subRoutineWrapper.append(firstElement)
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         #checking what type is the function(currently types are not being handled)
         if nextElement.tag.strip() != ("keyword" or "identifier"): 
             print("error compiling classVar, expected keyword or identifier but recived", nextElement.tag, nextElement.text )
             return -1
         subRoutineWrapper.append(nextElement)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.tag.strip() != "identifier": 
             print("error compiling classVar, expected identifier but recived", nextElement.tag, nextElement.text)
             return -1
         subRoutineWrapper.append(nextElement)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.text.strip() != "(": 
             print("error compiling classVar, expected ; but recived", nextElement.text )
             return -1 
         subRoutineWrapper.append(nextElement)
         
         #if next elements are the argumenst of the function arguments
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         if nextElement.text.strip() == ")":
             parameterListWrapper = self.__createWrapper("parameterList")
             parameterListWrapper.text = ' '
@@ -187,7 +211,7 @@ class CompliationEngine:
             print("error compiling subRoutin, expected ) but recived", nextElement.text )
             return -1 
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         
         nextElement = self.compileSubroutineBody()
         subRoutineWrapper.append(nextElement)
@@ -204,13 +228,13 @@ class CompliationEngine:
                 return -1  
             parameterListWrapper.append(nextElement)
             
-            nextElement = self.__getNextElements()
+            nextElement = self.__getNextElement()
             if nextElement.tag != ("keyword" or "identifier"):
                 print("error compiling compileParameterList, expected keyword or identifier but recived", nextElement.text )
                 return -1  
             parameterListWrapper.append(nextElement)
             
-            nextElement = self.__getNextElements()
+            nextElement = self.__getNextElement()
             if nextElement.text.strip() == ",":
                 parameterListWrapper.append(nextElement)
             elif(nextElement.text.strip() == ")"):
@@ -219,7 +243,7 @@ class CompliationEngine:
                 print("error compiling compileParameterList, expected , but recived", nextElement.text,nextElement.text )
                 return -1  
             
-            nextElement = self.__getNextElements()
+            nextElement = self.__getNextElement()
         
         return parameterListWrapper
         
@@ -231,16 +255,23 @@ class CompliationEngine:
             return -1
         subroutineBodyWrapper.append(nextElement)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         
         if nextElement.text.strip() == "var":
             while(nextElement.text.strip() == "var"):
                 nextElement = self.compileVar()
                 subroutineBodyWrapper.append(nextElement)
                 
-                nextElement = self.__getNextElements()
-        # nextElement = self.handleStatments("let")
-        
+                nextElement = self.__getNextElement()
+       
+        #changing the next element to next statment to make the code more readble
+        nextStatment = nextElement
+        while nextStatment.text.strip() != '}':
+            nextStatment = self.compileStatments()
+            subroutineBodyWrapper.append(nextElement)
+            nextStatment = self.__getNextElement()
+            
+            
         return subroutineBodyWrapper
             
             
@@ -252,23 +283,25 @@ class CompliationEngine:
             return -1
         varWrapper.append(currentElement)
         
-        # nextElement = self.__getNextElements()
+        # nextElement = self.__getNextElement()
         # if nextElement.tag != "keyword":
         #     print("no keyword type was found, got: ", nextElement.text,nextElement.tag)
         #     return -1
         # varWrapper.append(nextElement)
         
-        nextElement = self.__getNextElements()
-        if nextElement.tag != ("identifier" or "keyword"):
-            print("no keyword or identifier type was found, got: ", currentElement.text,currentElement.tag)
-            return -1
-        varWrapper.append(nextElement)
+        nextElement = self.__getNextElement()
         
+        if nextElement.tag == "identifier" or  nextElement.tag == "keyword":
+            varWrapper.append(nextElement)
+        else:
+            print("no keyword or identifier type was found, got: ", currentElement.text,currentElement.tag)
+            return -1    
+            
         tokenType = "identifier"
         error = "no identifier type was found, got: "
         self.__addByTag(tokenType,error,varWrapper)
         
-        nextElement = self.__getNextElements()
+        nextElement = self.__getNextElement()
         while(nextElement.text.strip() != ";"):
             if nextElement.text.strip() != ",":
                 print("missing ',', got: ", currentElement.text,currentElement.tag)
@@ -279,27 +312,31 @@ class CompliationEngine:
             error = "no identifier type was found, got: "
             self.__addByTag(tokenType,error,varWrapper)
             
-            nextElement = self.__getNextElements()
+            nextElement = self.__getNextElement()
+        
+        #appanding the last element of the var, which is ;
+        varWrapper.append(nextElement)
             
         return varWrapper
+        
+    def compileStatments(self):
+        statmentWrapper = self.__createWrapper("statements")
+        currentElement = self.__getCurrentElement()
+        try:
+            statment = self.handleStatments(currentElement.text.strip())
+            statmentWrapper.append(statment)
+        except KeyError:
+            print("!!!")
+
+        return statmentWrapper
+            
             
        
         
             
             
             
-     
-            
-            
-        
-        
-        
-            
-    
-
-                    
-        
-        
+             
         
     #-------------------statments--------------------------
     
@@ -309,72 +346,206 @@ class CompliationEngine:
             
             
     def compileDo(self):
-        return -1
+        doWrapper = ET.Element("doStatement") 
+        nextElement = self.__addKeywordAndIdentifier(doWrapper)
+        
+        while(nextElement.text.strip() != "("):
+            if nextElement.text.strip() != ".":
+                print("expected an . recived: ", nextElement.text,nextElement.tag)
+                return - 1
+            doWrapper.append(nextElement)
+            
+            nextElement = self.__getNextElement()
+            if nextElement.tag != "identifier":
+                print("expected an idenrifier, recived:", nextElement.text,nextElement.tag)
+                return -1
+            doWrapper.append(nextElement)
+            nextElement = self.__getNextElement()
+        #adding the ( after checking the while statment
+        doWrapper.append(nextElement)
+        
+        
+        closingBrackets = self.__getNextElement()
+        if closingBrackets.text.strip() != ")":
+            closingBrackets= self.compileExpressionList
+        doWrapper.append(closingBrackets)
+        
+        closingStatment = self.__getNextElement()
+        if closingStatment.text.strip() != ";":
+            print("expected ;, recived:", nextElement.text,nextElement.tag)
+            return -1
+        doWrapper.append(closingStatment)
+        
+
+        return doWrapper
     
     def compileIf(self):
-        return -1
-    
+        ifWrapper = ET.Element("ifStatement")
+        
+        ifElement = self.__getCurrentElement()
+        if ifElement.text.strip() != "if":
+            self.__errorMessage("if",ifElement)
+            return -1
+        ifWrapper.append(ifElement)
+        
+        openBrackets = self.__getNextElement()
+        if openBrackets.text.strip() != "(":
+            self.__errorMessage("(",ifElement)
+            return -1
+        ifWrapper.append(openBrackets)
+        
+        self.__getNextElement()
+        expression = self.compileExpression()
+        ifWrapper.append(expression)
+        
+        closeBrackets = self.__getNextElement()
+        if closeBrackets.text.strip() != ")":
+            self.__errorMessage(")",closeBrackets)
+            return -1
+        ifWrapper.append(closeBrackets)
+        
+        openCurrlyBrackets = self.__getNextElement()
+        if openCurrlyBrackets.text.strip() != "{":
+            self.__errorMessage("{",openCurrlyBrackets)
+            return -1
+        ifWrapper.append(openCurrlyBrackets)
+        
+        nextStatment = self.__getNextElement()
+        #TODO: repeating few times, create a function to handle it
+        while(nextStatment.text.strip() != "}"):
+            nextStatment = self.compileStatments()
+            ifWrapper.append(nextStatment)
+            nextStatment = self.__getNextElement()
+        ifWrapper.append(nextStatment)
+        
+        elseOrEnd = self.__getNextElement()
+        if elseOrEnd.text.strip() != "else":
+            return ifWrapper
+        else:
+            ifWrapper.append(elseOrEnd)
+            openCurrlyBrackets = self.__getNextElement()
+            if openCurrlyBrackets.text.strip() != "{":
+                self.__errorMessage("{",openCurrlyBrackets)
+                return -1
+            while(nextStatment.text.strip() != "}"):
+                nextStatment = self.compileStatments()
+                ifWrapper.append(nextStatment)
+                nextStatment = self.__getNextElement()
+            ifWrapper.append(nextStatment)
+            return ifWrapper
+                
     def compileWhile(self):
+        print("from while")
         return -1
     
     def compileReturn(self):
-        return -1
+        returnWrapper = ET.Element("returnStatement")
+        returnItem = self.__getCurrentElement()
+        
+        if returnItem.text.strip() != "return":
+            self.__errorMessage("return",returnItem)
+            return -1
+        returnWrapper.append(returnItem)
+        
+        endingLine = self.__getNextElement()
+        if endingLine.text.strip() != ";":
+            self.__errorMessage(";",endingLine)
+            return -1
+        returnWrapper.append(endingLine)
+        
+        return returnWrapper
     
     def compileLet(self):
-
         letWrapper = ET.Element("letStatement") 
-        
-        counter = index -1
-        
+                
         # #-------removing the element the let element to aviode duplication
-        let = root[index]
-        #-------Inserting the element again under the let wrapper
-        letWrapper = __appendExistingElement(root,letWrapper,let)
+        letElement = self.__getCurrentElement()
+
+        if letElement.text.strip() != "let":
+            print("error compiling let, missing keyword let, got instead:",letElement.text,letElement.tag)
+            return -1
+        letWrapper.append(letElement)
         
-        nextElement = __getNextElement(counter)
+        
+        identifier = self.__getNextElement()
         #TODO:create check function
-        if nextElement.tag != "identifier":
-            print("error compiling let, missing identifier")
+        if identifier.tag != "identifier":
+            self.__errorMessage("identifier",identifier)
             return -1
         #-------adding the first child to the let wrapper---------
-        letWrapper = __appendExistingElement(root,letWrapper,nextElement)
+        letWrapper.append(identifier)
         
-        nextElement = __getNextElement(counter)  
-        if nextElement.text.strip() != "=":
-            print("error compiling let, missing =")
+        equalOrExpression = self.__getNextElement()  
+        
+        if equalOrExpression.text.strip() == "[":
+            letWrapper.append(equalOrExpression)
+            self.__getNextElement()
+            exp = self.compileExpression()
+            letWrapper.append(exp)
+            
+            closingSquareBrackets = self.__getNextElement()
+            if closingSquareBrackets.text.strip() != "]":
+                self.__errorMessage("]",closingBrackets)
+                return -1
+            letWrapper.append(closingSquareBrackets)
+            
+            equalOrExpression = self.__getNextElement()
+             
+        if equalOrExpression.text.strip() != "=":
+            self.__errorMessage("=",equalOrExpression)
             return -1
-        letWrapper = __appendExistingElement(root,letWrapper,nextElement)
+        letWrapper.append(equalOrExpression)
         
-        exp = compileExpression(counter)
+        nextElement = self.__getNextElement()
+        exp = self.compileExpression()
         letWrapper.append(exp)
     
-        nextElement = __getNextElement(counter)
-        if nextElement.text.strip() != ";":
-            print(nextElement.text)
-            print("error compiling let, missing ; at",counter)
+        endElement = self.__getNextElement()
+        if endElement.text.strip() != ";":
+            self.__errorMessage(";",endElement)
             return -1
-        letWrapper = __appendExistingElement(root,letWrapper,nextElement)
-        root.insert(index,letWrapper)
-        previousLet = root[index+1]
-        root.remove(previousLet)
-
+        letWrapper.append(endElement)
         return letWrapper
     
     #-------------------expersions--------------------------
-    def compileExpression(index):
+    def compileExpression(self):
         expressionWrapper = ET.Element("expression")
         termWrapper = ET.Element("term")
-
-        nextElement = __getNextElement(index)
-        if nextElement.tag != "identifier":
-            print("error compiling let, missing identifier")
-            return -1
-        termWrapper = __appendExistingElement(root,termWrapper,nextElement)
         
+
+        currentElement = self.__getCurrentElement()
+        if currentElement.tag != "identifier":
+            self.__errorMessage("identifier",currentElement)
+            return -1
+        termWrapper.append(currentElement)
+                
         expressionWrapper.append(termWrapper)
         return expressionWrapper
+    
+    def compileTerm(self):
+        #term is every part of the expression after the =
+        termWrapper = ET.Element("term")
+        currentElement = self.__getCurrentElement()
+        if currentElement.tag != "identifier":
+            self.__errorMessage("identifier",currentElement)
+            return -1
+        termWrapper.append(currentElement)
+        
 
 
-   
+    def compileExpressionList(self):
+        expressionListWrapper = ET.Element("expressionList")
+        currentElement = self.__getCurrentElement()
+        
+        if currentElement.text.strip() == ")":
+            expressionListWrapper.append(currentElement)
+        else:
+            #TODO: handle expression correctly
+            print("handling exeprssion")
+            exeprssion = self.compileExpression()
+            expressionListWrapper.append(exeprssion)
+            
+        
+        return compileExpressionList
     
     
